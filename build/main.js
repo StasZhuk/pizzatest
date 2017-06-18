@@ -76,7 +76,7 @@
     menu.className = className;
     var listItems = '';
     array.forEach(function(item) {
-        listItems += '<li><a>' + item + '</a></li>'
+        listItems += '<li><a href="#">' + item + '</a></li>'
     });
     menu.innerHTML = listItems;
     return menu;
