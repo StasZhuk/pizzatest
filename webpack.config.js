@@ -9,6 +9,9 @@ const css = require('./webpack/css');
 const extractCSS = require('./webpack/css.extract');
 const uglifyJS = require('./webpack/js.uglify');
 const images = require('./webpack/images');
+const minifyCSS = require('./webpack/css.minify');
+const babel = require('./webpack/babel');
+const fonts = require('./webpack/fonts');
 
 
 const PATHS = {
@@ -43,11 +46,13 @@ const common = merge([
             new webpack.ProvidePlugin({
                 $: 'jquery',
                 jQuery: 'jquery'
-            }),       
+            }),     
         ]
     },
+    fonts(),
     pug(),
-    images()
+    images(),
+    babel()
 ]);
 
 module.exports = function(env) {
@@ -55,7 +60,9 @@ module.exports = function(env) {
         return merge([
             common,
             extractCSS(),
-            uglifyJS()
+            minifyCSS(),
+            uglifyJS(),
+            
         ])
     }
     if(env === "development") {
@@ -63,7 +70,8 @@ module.exports = function(env) {
             common,
             devServ(),
             sass(),
-            css()
+            css(),
+            minifyCSS()
         ])
     }
 };

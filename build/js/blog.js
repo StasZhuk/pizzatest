@@ -1,1 +1,1 @@
-webpackJsonp([1],{3:function(e,n){},6:function(e,n,o){"use strict";Object.defineProperty(n,"__esModule",{value:!0});var c=o(3),i=(o.n(c),o(0)),s=(o.n(i),o(2));o.i(s.a)(["Главная","Блог"],"menu");console.log("in blog.js")}},[6]);
+webpackJsonp([1],{2:function(e,n){},5:function(e,n,o){"use strict";Object.defineProperty(n,"__esModule",{value:!0});var c=o(2),i=(o.n(c),o(1));o.i(i.a)(["Главная","Блог"],"menu");console.log("in blog.js")}},[5]);
