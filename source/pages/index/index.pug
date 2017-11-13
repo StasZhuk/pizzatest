@@ -1,6 +1,61 @@
 extends ../base.pug
 block title
-    | Index page
+    | pizza test work
 block main
-    h1 page Index-pug чтото
-    img(src=require("./envelope.svg") width="100")
+    .container-fluid
+        .main-content
+            .row
+                .col-sm-12
+                    .toolbar
+                        button#sort-name.btn.btn-default(data-sort="false")
+                            i.fa.fa-sort-alpha-asc
+                            span  Sort by name
+                        button#sort-birthday.btn.btn-default(data-sort="false")
+                            i.fa.fa-sort-numeric-desc
+                            span  Sort by birthday
+                        button#reset.btn.btn-danger
+                            i.fa.fa-ban
+                            span  Reset
+            .row
+                .col-sm-12
+                    .filter-block
+                        form.form-inline
+                            .form-group
+                                select#select.form-control.form__select
+                                    option(value="all" selected) Все
+                                    option(value="cook") Повар
+                                    option(value="waiter") Оффициант
+                                    option(value="driver") Водитель
+                            .form-check
+                                label.form-check-label
+                                    input(id="checkbox" type="checkbox" name="filter-archive" value="").form-check-input
+                                    span в архиве
+                            button(type="button")#create.btn.btn-warning
+                                i.fa.fa-ban
+                                span  Создать
+            .row
+                .col-sm-12
+                    ul#list-persons
+            .form-wrap
+                form.form#form-create
+                    h3.form__heading
+                    label
+                        span Имя:
+                        input(type="text" name="name" placeholder="Иван Иванов").form-control
+                    label
+                        span Телефон:
+                        input(id="input-phone" type="text" name="phone" placeholder="+7 (999) 999 9999").form-control
+                    label
+                        span Дата рождения:
+                        input(id="input-data" type="text" name="data" placeholder="12.12.1999").form-control
+                    select#select-create.form-control.form__select
+                        option(value="cook" selected) Повар
+                        option(value="waiter") Оффициант
+                        option(value="driver") Водитель
+                    .form__status
+                        span Статус: 
+                        label.form-check-label
+                            input(id="checkbox-create" type="checkbox" name="check-create").form-check-input
+                            span в архиве
+                    .btn-wrap.text-right
+                        button(type="button")#save.btn.btn-success Сохранить
