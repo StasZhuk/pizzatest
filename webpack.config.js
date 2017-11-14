@@ -51,7 +51,7 @@ module.exports = function(env) {
             common,
             extractCSS(),
             minifyCSS(),
-            uglifyJS()
+            // uglifyJS()
         ])
     }
     if(env === "development") {

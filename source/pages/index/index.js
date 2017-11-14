@@ -3,9 +3,11 @@ import 'normalize.css';
 import '../../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../../../node_modules/font-awesome/css/font-awesome.min.css';
 import list from './employees.json';
-import {dataParse, sortByData, sortByName, cloneArr} from './sortFunc';
-import { mask, setCursorPosition} from './maskInput';
-import Card from './cardPeople';
+import {dataParse, sortByData, sortByName, cloneArr, sortByProperty} from './js/sortFunc';
+import { mask, setCursorPosition} from './js/maskInput';
+import {validate, createWarning} from './js/validateFunc';
+import createListPeople from './js/createListItems';
+import Card from './js/cardPeople';
 
     // Элементы управения
 let appCont = document.getElementById('list-persons'),
@@ -30,48 +32,48 @@ let appCont = document.getElementById('list-persons'),
 
 window.addEventListener("DOMContentLoaded", function () {
     // создаем список
-    createListPeople(list);
+    createListPeople(list, appCont);
 
     // клонируем массив
     sortArr = cloneArr(list);
 
     // кнопка сортировки по имени
     btnName.addEventListener('click', () => {
-        sortByProperty(btnName, btnBirth, sortByName);
+        sortByProperty(btnName, btnBirth, sortByName, sortArr);
 
-        createListPeople(sortArr);
+        createListPeople(sortArr, appCont);
     });
 
     // кнопка сортировки по дате
     btnBirth.addEventListener('click', () => {
-        sortByProperty(btnBirth, btnName, sortByData);
+        sortByProperty(btnBirth, btnName, sortByData, sortArr);
 
-        createListPeople(sortArr);
+        createListPeople(sortArr, appCont);
     });
 
     // кнопка сброса всех параметров
     btnReset.addEventListener('click', () => {
         resetAll();
 
-        createListPeople(list);
+        createListPeople(list, appCont);
     });
 
     // сортировка чекбокс
     checkbox.addEventListener('change', () => {
         reCheck(list);
         reSelect(sortArr);
-        reSort();
+        reSort(sortArr);
 
-        createListPeople(sortArr);
+        createListPeople(sortArr, appCont);
     });
 
     // сортировка выпадающий список
     select.addEventListener('change', () => {
         reSelect(list);
         reCheck(sortArr);
-        reSort();
+        reSort(sortArr);
 
-        createListPeople(sortArr);
+        createListPeople(sortArr, appCont);
     });
 
 
@@ -79,7 +81,7 @@ window.addEventListener("DOMContentLoaded", function () {
     appCont.addEventListener('click', e => {
         var target = e.target;
         
-        if (target.classList.contains('btn-close')) {
+        if (target.classList.contains('btn-remove')) {
             var id = target.getAttribute('data-id');
 
             list.splice(id - 1, 1);
@@ -90,9 +92,9 @@ window.addEventListener("DOMContentLoaded", function () {
 
             reSelect(list);
             reCheck(sortArr);
-            reSort();
+            reSort(sortArr);
 
-            createListPeople(sortArr);
+            createListPeople(sortArr, appCont);
         }
     }, false);
 
@@ -104,13 +106,16 @@ window.addEventListener("DOMContentLoaded", function () {
         if (target.tagName === "LI" || target.id === "create") {
             var title = formWrap.querySelector('h3'),
                 btn = formWrap.querySelector('.btn-success'),
-                index = target.dataset.indexList,
-                card = list[index];
-
+                index = target.dataset.indexList;
+                
+            // открываем попап
             if (!formWrap.classList.contains('active')) formWrap.classList.add('active');
 
             // если клик по карточке создаем попап для редоктирования
             if (target.tagName === "LI") {
+                var card = list[index];
+
+                // создаем нужную форму и заполняем данными с активной карточки
                 title.innerHTML = "Редактирование карточки";
                 btn.innerHTML = "Сохранить";
                 btn.id = 'change';
@@ -132,6 +137,7 @@ window.addEventListener("DOMContentLoaded", function () {
                 btn.innerHTML = "Создать";
                 btn.id = 'create-card';
 
+                // обнуяем поля
                 nameInput.value = '';
                 phoneInput.value = '';
                 dataInput.value = '';
@@ -139,15 +145,17 @@ window.addEventListener("DOMContentLoaded", function () {
                 checkboxInput.checked = false;
             }
         }
-
-        if (target.classList.contains('form-wrap')) formWrap.classList.remove('active');
+        // закрываем попап
+        if (target.classList.contains('form-wrap') || target.classList.contains('btn-close-popup')) formWrap.classList.remove('active');
     });
 
+    // событие сохранения новой ии отредактированной карты
     btnSave.addEventListener('click', (e) => {
         var target = e.target,
             index = target.parentElement.parentElement.dataset.indexCard,
             card = list[index];
 
+        // если редактирование
         if (btnSave.id == 'change') {
 
             if (validate(nameInput, phoneInput, dataInput)) {
@@ -166,10 +174,11 @@ window.addEventListener("DOMContentLoaded", function () {
 
                 reCheck(list);
                 reSelect(sortArr);
-                reSort();
+                reSort(sortArr);
 
-                createListPeople(sortArr);
+                createListPeople(sortArr, appCont);
             }
+        // если создание новой карты 
         } else if (btnSave.id === 'create-card') {
 
             for (var i = 0; i < selectInput.options.length; i++) {
@@ -177,7 +186,7 @@ window.addEventListener("DOMContentLoaded", function () {
                     var activeSelect = selectInput.options[i];
                 }
             }
-            console.log(list.length);
+
             if (validate(nameInput, phoneInput, dataInput)) {
                 var newCard = new Card(nameInput.value, activeSelect.value, phoneInput.value, dataInput.value, checkboxInput.checked, list.length + 1);
 
@@ -188,20 +197,11 @@ window.addEventListener("DOMContentLoaded", function () {
 
                 reCheck(list);
                 reSelect(sortArr);
-                reSort();
+                reSort(sortArr);
 
-                createListPeople(sortArr);
+                createListPeople(sortArr, appCont);
             }
         }
-    });
-
-    btnCreate.addEventListener('click', e => {
-        var title = formWrap.querySelector('h3'),
-            btn = formWrap.querySelector('.btn-success');
-
-        title.innerHTML = "Создание карточки";
-        btn.innerHTML = "Создать";
-        btn.id = 'create';
     });
 
     // события маски ипута телефон
@@ -215,81 +215,17 @@ window.addEventListener("DOMContentLoaded", function () {
     dataInput.addEventListener("blur", mask, false);
 });
 
-function validate(name, phone, birthday) {
-    var flag = 0;
-    if (name.value == '') {
-        flag = -1;
-        console.warn('невернор указано имя');
-        createWarning(name);
-    }
-
-    if (phone.value.length != 17) {
-        flag = -1;
-        console.warn('невернор указано телефон');
-        createWarning(phone);
-    }
-
-    if (birthday.value.length != 10) {
-        flag = -1;
-        console.warn('невернор указана дата');
-        createWarning(birthday);
-    }
-
-    if (flag < 0) return false
-
-    return true;
-}
-
-// Создание подсказок для инпутов
-function createWarning(elem) {
-    var span = document.createElement('SPAN');
-
-    span.innerHTML = 'неверно заполнено поле';
-    span.classList.add('warning');
-
-    elem.parentElement.appendChild(span);
-    elem.classList.add('wrong-input');
-
-    setTimeout(() => {
-        elem.parentElement.removeChild(span);
-        elem.classList.remove('wrong-input');
-    }, 3000);
-}
-
-// функция создание списка сотрудников из массива объектов
-function createListPeople(data) {
-    appCont.innerHTML = '';
-
-    data.forEach(item => {
-        let role,
-            li = document.createElement('LI');
-
-        if (item.role === "driver") role = 'Водитель';
-        else if (item.role === "waiter") role = 'Оффициант';
-        else role = 'Повар';
-
-        li.classList.add('list-item');
-        li.setAttribute('data-index-list', item.id - 1);
-        li.innerHTML = `<span>Сотрудник: ${item.name}</span>
-                        <span>Должность: ${role}</span>
-                        <span>Телефон: ${item.phone}</span>
-                        <span class="btn-close" data-id="${item.id}"><i class="fa fa-close"></i></span>`
-
-        appCont.appendChild(li);
-    });
-}
-
 // функция пересортировки
-function reSort() {
+function reSort(arr) {
     if (btnName.getAttribute('data-sort') == 'forward')
-        sortArr.sort(sortByName);
+        arr.sort(sortByName);
     else if (btnName.getAttribute('data-sort') == 'reverse')
-        sortArr.sort(sortByName).reverse();
+        arr.sort(sortByName).reverse();
 
     if (btnBirth.getAttribute('data-sort') == 'forward')
-        sortArr.sort(sortByData);
+        arr.sort(sortByData);
     else if (btnBirth.getAttribute('data-sort') == 'reverse')
-        sortArr.sort(sortByData).reverse();
+        arr.sort(sortByData).reverse();
 }
 
 // функция создания массива объектов чекбокса
@@ -323,21 +259,4 @@ function resetAll() {
     btnBirth.setAttribute('data-sort', false);
     checkbox.checked = false;
     select.options[0].selected = true;
-}
-
-// фенкция сортировки по параметрам имя или дата
-function sortByProperty(propSort, propUnsort, funcSort) {
-    if (propSort.getAttribute('data-sort') === 'false') {
-        propUnsort.setAttribute('data-sort', false);
-        propSort.setAttribute('data-sort', 'forward');
-
-        sortArr.sort(funcSort);
-    } else {
-        sortArr.reverse();
-
-        if (propSort.getAttribute('data-sort') === "reverse")
-            propSort.setAttribute('data-sort', 'forward');
-        else
-            propSort.setAttribute('data-sort', 'reverse');
-    }
 }

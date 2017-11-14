@@ -2,7 +2,7 @@
 function cloneArr(arr) {
     var newArr = [];
 
-    arr.forEach(item => {
+    arr.forEach((item) => {
         newArr.push(item);
     });
 
@@ -37,4 +37,21 @@ function dataParse(data) {
     return Date.parse(data.split('.').reverse().join('-'))
 }
 
-export {dataParse, sortByData, sortByName, cloneArr}
+// фенкция сортировки по параметрам имя или дата
+function sortByProperty(propSort, propUnsort, funcSort, sortArr) {
+    if (propSort.getAttribute('data-sort') === 'false') {
+        propUnsort.setAttribute('data-sort', false);
+        propSort.setAttribute('data-sort', 'forward');
+
+        sortArr.sort(funcSort);
+    } else {
+        sortArr.reverse();
+
+        if (propSort.getAttribute('data-sort') === "reverse")
+            propSort.setAttribute('data-sort', 'forward');
+        else
+            propSort.setAttribute('data-sort', 'reverse');
+    }
+}
+
+export {dataParse, sortByData, sortByName, cloneArr, sortByProperty}

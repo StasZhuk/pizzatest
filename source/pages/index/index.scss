@@ -43,7 +43,7 @@ ol {
     display: flex;
     flex-direction: column;
     padding: 10px;
-    background-color: coral;
+    background-color: #BFB5D7;
     color: #fff;
     margin-bottom: 10px;
     border-radius: 5px;
@@ -51,7 +51,7 @@ ol {
     i {
         pointer-events: none;
     }
-    .btn-close {
+    .btn-remove {
         pointer-events: all;
     }
 }
@@ -95,10 +95,11 @@ ol {
     }
 }
 
-.btn-close {
+.btn-remove,
+.btn-close-popup {
     position: absolute;
     right: 10px;
-    top: 10px;
+    top: 5px;
     cursor: pointer;
 }
 
@@ -149,7 +150,7 @@ ol {
     margin-bottom: 10px;
 }
 
-#create {
+#create, .btn-close-popup {
     & * {
         pointer-events: none;
     }
